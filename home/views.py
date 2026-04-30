@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Count
 from django.utils import timezone
+from django.conf import settings
 from customers.models import Customer, Connection
 from billing.models import Invoice, Payment
 from tickets.models import Ticket
@@ -35,6 +36,15 @@ def dashboard(request):
     # Ticket stats
     open_tickets = Ticket.objects.filter(status__in=['open', 'in_progress']).count()
     critical_tickets = Ticket.objects.filter(status__in=['open', 'in_progress'], priority='critical').count()
+
+    # RADIUS online users
+    online_users = 0
+    if getattr(settings, 'RADIUS_ENABLED', False):
+        try:
+            from radius.models import Radacct
+            online_users = Radacct.objects.using('radius').filter(acctstoptime__isnull=True).count()
+        except Exception:
+            pass
 
     # Recent activity
     recent_customers = Customer.objects.order_by('-created_at')[:5]
@@ -77,5 +87,6 @@ def dashboard(request):
         'recent_tickets': recent_tickets,
         'chart_labels': chart_labels,
         'chart_data': chart_data,
+        'online_users': online_users,
     }
     return render(request, 'home/dashboard.html', context)

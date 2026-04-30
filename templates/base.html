@@ -73,6 +73,11 @@
           <i class="bi bi-hdd-network me-2"></i>IP Pools
         </a>
       </li>
+      <li class="nav-item">
+        <a href="{% url 'radius:sessions' %}" class="nav-link text-white {% if request.resolver_match.app_name == 'radius' %}active bg-primary rounded mx-2{% endif %}">
+          <i class="bi bi-activity me-2"></i>Live Sessions
+        </a>
+      </li>
       <li class="nav-item mt-1">
         <span class="nav-label px-3 text-muted small text-uppercase">Support</span>
       </li>

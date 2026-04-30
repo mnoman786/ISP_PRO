@@ -68,8 +68,9 @@
               <td>{{ conn.ip_address|default:'—' }}</td>
               <td><span class="badge badge-{{ conn.status }}">{{ conn.get_status_display }}</span></td>
               <td class="text-muted small">{{ conn.expiry_date|default:'—' }}</td>
-              <td>
+              <td class="d-flex gap-1">
                 <a href="{% url 'customers:connection_edit' conn.pk %}" class="btn btn-sm btn-outline-secondary py-0 px-1"><i class="bi bi-pencil"></i></a>
+                <a href="{% url 'radius:user_sessions' conn.username %}" class="btn btn-sm btn-outline-info py-0 px-1" title="Session History"><i class="bi bi-clock-history"></i></a>
               </td>
             </tr>
             {% empty %}<tr><td colspan="7" class="text-muted text-center py-3">No connections.</td></tr>

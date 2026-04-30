@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Sessions — {{ username }}{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'home:dashboard' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'radius:sessions' %}">Live Sessions</a></li>
+<li class="breadcrumb-item active">{{ username }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h4><i class="bi bi-clock-history me-2 text-info"></i>Session History — {{ username }}</h4>
+</div>
+
+{% if not radius_enabled %}
+<div class="alert alert-warning">RADIUS is not enabled.</div>
+{% else %}
+<div class="card shadow-sm border-0">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr><th>Started</th><th>Stopped</th><th>Duration</th><th>IP</th><th>RX (MB)</th><th>TX (MB)</th><th>Terminate Cause</th></tr>
+      </thead>
+      <tbody>
+        {% for s in sessions %}
+        <tr>
+          <td class="small">{{ s.acctstarttime|date:"d M Y H:i"|default:'—' }}</td>
+          <td class="small text-muted">{{ s.acctstoptime|date:"d M Y H:i"|default:'<span class="text-success fw-semibold">Online</span>' }}</td>
+          <td class="small text-muted">{{ s.acctsessiontime|default:'—' }}s</td>
+          <td><code class="small">{{ s.framedipaddress|default:'—' }}</code></td>
+          <td class="small">{{ s.rx_mb }}</td>
+          <td class="small">{{ s.tx_mb }}</td>
+          <td class="small text-muted">{{ s.acctterminatecause|default:'—' }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center text-muted py-4">No session history found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
