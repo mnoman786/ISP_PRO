@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Delete Device{% endblock %}
+{% block content %}
+{% include 'components/delete_card.html' with obj_type='Device' cancel_url='/network/' %}
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Connections{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'home:dashboard' %}">Home</a></li>
+<li class="breadcrumb-item active">Connections</li>
+{% endblock %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <div><h4>Connections</h4><p class="text-muted small mb-0">{{ connections.count }} total</p></div>
+  <a href="{% url 'customers:connection_create' %}" class="btn btn-primary"><i class="bi bi-plus me-1"></i>Add Connection</a>
+</div>
+<!-- Filters -->
+<div class="card shadow-sm border-0 mb-3">
+  <div class="card-body py-2">
+    <form class="row g-2 align-items-center" method="get">
+      <div class="col-md-5"><input type="text" name="q" value="{{ q }}" class="form-control form-control-sm" placeholder="Search username, customer, IP..."></div>
+      <div class="col-md-2">
+        <select name="status" class="form-select form-select-sm">
+          <option value="">All Status</option>
+          <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+          <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
+          <option value="suspended" {% if status == 'suspended' %}selected{% endif %}>Suspended</option>
+          <option value="expired" {% if status == 'expired' %}selected{% endif %}>Expired</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-search"></i></button>
+        <a href="{% url 'customers:connection_list' %}" class="btn btn-sm btn-outline-secondary">Clear</a>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="card shadow-sm border-0">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead><tr><th>Username</th><th>Customer</th><th>Package</th><th>Type</th><th>IP</th><th>Status</th><th>Expiry</th><th></th></tr></thead>
+      <tbody>
+        {% for c in connections %}
+        <tr>
+          <td class="fw-semibold">{{ c.username }}</td>
+          <td><a href="{% url 'customers:customer_detail' c.customer.pk %}" class="text-decoration-none">{{ c.customer.name }}</a></td>
+          <td>{{ c.package.name|default:'—' }}</td>
+          <td>{{ c.get_connection_type_display }}</td>
+          <td>{{ c.ip_address|default:'—' }}</td>
+          <td><span class="badge badge-{{ c.status }}">{{ c.get_status_display }}</span></td>
+          <td class="text-muted small">{{ c.expiry_date|default:'—' }}</td>
+          <td>
+            <a href="{% url 'customers:connection_edit' c.pk %}" class="btn btn-sm btn-outline-secondary py-0 px-2"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'customers:connection_delete' c.pk %}" class="btn btn-sm btn-outline-danger py-0 px-2"><i class="bi bi-trash"></i></a>
+          </td>
+        </tr>
+        {% empty %}<tr><td colspan="8" class="text-center text-muted py-4">No connections found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

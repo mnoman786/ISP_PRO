@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Delete Area{% endblock %}
+{% block content %}
+{% include 'components/delete_card.html' with obj_type='Area' cancel_url='/customers/areas/' %}
+{% endblock %}

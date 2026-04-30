@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-header"><h4>{{ title }}</h4></div>
+<div class="form-section" style="max-width:600px">
+  <form method="post">{% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-8"><label class="form-label fw-semibold small">Package Name *</label>{% render_field form.name class="form-control" %}</div>
+      <div class="col-md-4"><label class="form-label fw-semibold small">Type</label>{% render_field form.package_type class="form-select" %}</div>
+      <div class="col-md-3"><label class="form-label fw-semibold small">Download (Mbps) *</label>{% render_field form.speed_download class="form-control" %}</div>
+      <div class="col-md-3"><label class="form-label fw-semibold small">Upload (Mbps) *</label>{% render_field form.speed_upload class="form-control" %}</div>
+      <div class="col-md-3"><label class="form-label fw-semibold small">Price (PKR) *</label>{% render_field form.price class="form-control" %}</div>
+      <div class="col-md-3"><label class="form-label fw-semibold small">Duration (days)</label>{% render_field form.duration_days class="form-control" %}</div>
+      <div class="col-md-4"><label class="form-label fw-semibold small">Data Limit (GB)</label>{% render_field form.data_limit_gb class="form-control" placeholder="Leave blank for unlimited" %}</div>
+      <div class="col-md-4"><label class="form-label fw-semibold small">Status</label>{% render_field form.status class="form-select" %}</div>
+      <div class="col-12"><label class="form-label fw-semibold small">Description</label>{% render_field form.description class="form-control" rows="3" %}</div>
+    </div>
+    <div class="d-flex gap-2 mt-4">
+      <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Save</button>
+      <a href="{% url 'packages:package_list' %}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

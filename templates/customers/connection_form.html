@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}{{ title }}{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'home:dashboard' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'customers:connection_list' %}">Connections</a></li>
+<li class="breadcrumb-item active">{{ title }}</li>
+{% endblock %}
+{% block content %}
+<div class="page-header"><h4>{{ title }}</h4></div>
+<div class="form-section" style="max-width:760px">
+  <form method="post">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label fw-semibold small">Customer *</label>
+        {% render_field form.customer class="form-select" %}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label fw-semibold small">MikroTik Router</label>
+        {% render_field form.mikrotik_router class="form-select" %}
+        <div class="form-text">Select the router this user's PPPoE secret lives on.</div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label fw-semibold small">Package *</label>
+        {% render_field form.package class="form-select" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">Connection Type</label>
+        {% render_field form.connection_type class="form-select" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">PPPoE Username *</label>
+        {% render_field form.username class="form-control" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">Password *</label>
+        {% render_field form.password class="form-control" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">IP Address</label>
+        {% render_field form.ip_address class="form-control" placeholder="e.g. 192.168.1.10" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">MAC Address</label>
+        {% render_field form.mac_address class="form-control" placeholder="e.g. AA:BB:CC:DD:EE:FF" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">OLT/Device Port</label>
+        {% render_field form.olt_port class="form-control" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">Install Date *</label>
+        {% render_field form.install_date class="form-control" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">Expiry Date</label>
+        {% render_field form.expiry_date class="form-control" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">Area</label>
+        {% render_field form.area class="form-select" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">Status</label>
+        {% render_field form.status class="form-select" %}
+      </div>
+      <div class="col-md-4 d-flex align-items-end">
+        <div class="form-check">{% render_field form.static_ip class="form-check-input" %}<label class="form-check-label small">Static IP</label></div>
+      </div>
+      <div class="col-12">
+        <label class="form-label fw-semibold small">Notes</label>
+        {% render_field form.notes class="form-control" rows="2" %}
+      </div>
+    </div>
+    <div class="d-flex gap-2 mt-4">
+      <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Save</button>
+      <a href="{% if obj %}{% url 'customers:customer_detail' obj.customer.pk %}{% elif customer %}{% url 'customers:customer_detail' customer.pk %}{% else %}{% url 'customers:connection_list' %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

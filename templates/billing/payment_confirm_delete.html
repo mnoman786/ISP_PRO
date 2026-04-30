@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Delete Payment{% endblock %}
+{% block content %}
+{% include 'components/delete_card.html' with obj_type='Payment' cancel_url='/billing/' %}
+{% endblock %}

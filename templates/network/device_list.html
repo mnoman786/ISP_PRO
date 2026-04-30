@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %}Network Devices{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'home:dashboard' %}">Home</a></li>
+<li class="breadcrumb-item active">Network Devices</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <h4>Network Devices</h4>
+  <div class="d-flex gap-2">
+    <a href="{% url 'network:ippool_list' %}" class="btn btn-outline-secondary"><i class="bi bi-hdd-network me-1"></i>IP Pools</a>
+    <a href="{% url 'network:device_create' %}" class="btn btn-primary"><i class="bi bi-plus me-1"></i>Add Device</a>
+  </div>
+</div>
+
+{% if mikrotik_devices %}
+<!-- MikroTik routers summary strip -->
+<div class="row g-2 mb-3">
+  {% for r in mikrotik_devices %}
+  <div class="col-auto">
+    <div class="card border-0 shadow-sm px-3 py-2 d-flex flex-row align-items-center gap-3">
+      <div>
+        <div class="fw-semibold small">{{ r.name }}</div>
+        <div class="text-muted" style="font-size:11px">{{ r.get_api_host }}:{{ r.api_port }}</div>
+      </div>
+      <button class="btn btn-sm btn-outline-success py-0 px-2 mt-test-btn"
+              data-url="{% url 'network:mikrotik_test' r.pk %}"
+              data-name="{{ r.name }}"
+              title="Test API connection">
+        <i class="bi bi-wifi"></i> Test
+      </button>
+      <a href="{% url 'network:device_detail' r.pk %}" class="btn btn-sm btn-outline-primary py-0 px-2">
+        <i class="bi bi-terminal"></i> Manage
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="card shadow-sm border-0">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead><tr>
+        <th>Name</th><th>Type</th><th>Brand/Model</th><th>IP</th><th>Location</th><th>Area</th><th>Status</th><th>MikroTik</th><th></th>
+      </tr></thead>
+      <tbody>
+        {% for d in devices %}
+        <tr>
+          <td class="fw-semibold">
+            {% if d.is_mikrotik %}
+              <a href="{% url 'network:device_detail' d.pk %}" class="text-decoration-none text-dark">{{ d.name }}</a>
+            {% else %}
+              {{ d.name }}
+            {% endif %}
+          </td>
+          <td>{{ d.get_device_type_display }}</td>
+          <td class="text-muted small">{{ d.brand }} {{ d.model_no }}</td>
+          <td>{{ d.ip_address|default:'—' }}</td>
+          <td>{{ d.location|default:'—' }}</td>
+          <td>{{ d.area.name|default:'—' }}</td>
+          <td>
+            <span class="badge {% if d.status == 'online' %}badge-active{% elif d.status == 'offline' %}badge-suspended{% else %}badge-inactive{% endif %}">
+              {{ d.get_status_display }}
+            </span>
+          </td>
+          <td>
+            {% if d.is_mikrotik %}
+              <span class="badge bg-info text-white">
+                <i class="bi bi-router me-1"></i>MikroTik
+              </span>
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            {% if d.is_mikrotik %}
+            <a href="{% url 'network:device_detail' d.pk %}" class="btn btn-sm btn-outline-info py-0 px-2" title="Manage"><i class="bi bi-terminal"></i></a>
+            {% endif %}
+            <a href="{% url 'network:device_edit' d.pk %}" class="btn btn-sm btn-outline-secondary py-0 px-2"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'network:device_delete' d.pk %}" class="btn btn-sm btn-outline-danger py-0 px-2"><i class="bi bi-trash"></i></a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="9" class="text-center text-muted py-4">No devices yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Test result toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:1100">
+  <div id="testToast" class="toast" role="alert">
+    <div class="toast-header">
+      <i class="bi bi-wifi me-2" id="testToastIcon"></i>
+      <strong class="me-auto" id="testToastTitle">MikroTik Test</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+    </div>
+    <div class="toast-body" id="testToastBody"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.mt-test-btn').forEach(btn => {
+  btn.addEventListener('click', function () {
+    const url = this.dataset.url;
+    const name = this.dataset.name;
+    const origHtml = this.innerHTML;
+    this.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+    this.disabled = true;
+
+    fetch(url, {
+      method: 'POST',
+      headers: {'X-CSRFToken': '{{ csrf_token }}'},
+    })
+    .then(r => r.json())
+    .then(data => {
+      const toast = document.getElementById('testToast');
+      document.getElementById('testToastTitle').textContent = name;
+      document.getElementById('testToastBody').textContent = data.message;
+      document.getElementById('testToastIcon').className =
+        data.success ? 'bi bi-check-circle-fill text-success me-2' : 'bi bi-x-circle-fill text-danger me-2';
+      toast.className = 'toast ' + (data.success ? 'border-success' : 'border-danger');
+      bootstrap.Toast.getOrCreateInstance(toast, {delay: 5000}).show();
+    })
+    .catch(() => alert('Request failed'))
+    .finally(() => { this.innerHTML = origHtml; this.disabled = false; });
+  });
+});
+</script>
+{% endblock %}

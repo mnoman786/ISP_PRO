@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% block title %}{{ device.name }}{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'home:dashboard' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'network:device_list' %}">Network</a></li>
+<li class="breadcrumb-item active">{{ device.name }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <div>
+    <h4><i class="bi bi-router me-2 text-info"></i>{{ device.name }}</h4>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge {% if device.status == 'online' %}badge-active{% else %}badge-suspended{% endif %}">{{ device.get_status_display }}</span>
+      {% if device.is_mikrotik %}<span class="badge bg-info text-white">MikroTik API</span>{% endif %}
+      <span class="text-muted small">{{ device.get_api_host }}:{{ device.api_port }}</span>
+    </div>
+  </div>
+  <div class="d-flex gap-2">
+    {% if device.is_mikrotik %}
+    <button class="btn btn-outline-success btn-sm" id="testConnBtn"
+            data-url="{% url 'network:mikrotik_test' device.pk %}">
+      <i class="bi bi-wifi me-1"></i>Test Connection
+    </button>
+    {% endif %}
+    <a href="{% url 'network:device_edit' device.pk %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil me-1"></i>Edit</a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <!-- Left: device info + quick actions -->
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0 mb-3">
+      <div class="card-header bg-white fw-semibold border-0 pt-3"><i class="bi bi-info-circle me-1 text-primary"></i>Device Info</div>
+      <div class="card-body">
+        <table class="table table-borderless mb-0 small">
+          <tr><td class="text-muted">Type</td><td class="fw-semibold">{{ device.get_device_type_display }}</td></tr>
+          <tr><td class="text-muted">Brand</td><td>{{ device.brand|default:'—' }} {{ device.model_no }}</td></tr>
+          <tr><td class="text-muted">IP Address</td><td>{{ device.ip_address|default:'—' }}</td></tr>
+          <tr><td class="text-muted">MAC</td><td>{{ device.mac_address|default:'—' }}</td></tr>
+          <tr><td class="text-muted">Location</td><td>{{ device.location|default:'—' }}</td></tr>
+          <tr><td class="text-muted">Area</td><td>{{ device.area.name|default:'—' }}</td></tr>
+          {% if device.is_mikrotik %}
+          <tr><td colspan="2"><hr class="my-1"></td></tr>
+          <tr><td class="text-muted">API Host</td><td><code>{{ device.get_api_host }}:{{ device.api_port }}</code></td></tr>
+          <tr><td class="text-muted">API User</td><td>{{ device.api_username }}</td></tr>
+          <tr><td class="text-muted">SSL</td><td>{% if device.api_use_ssl %}<span class="text-success">Yes</span>{% else %}No{% endif %}</td></tr>
+          {% endif %}
+        </table>
+      </div>
+    </div>
+
+    {% if device.is_mikrotik %}
+    <!-- Manual enable/disable -->
+    <div class="card shadow-sm border-0 mb-3">
+      <div class="card-header bg-white fw-semibold border-0 pt-3"><i class="bi bi-toggle-on me-1 text-success"></i>Enable/Disable User</div>
+      <div class="card-body">
+        <form method="post" action="{% url 'network:mikrotik_user_enable' device.pk %}" class="mb-2">
+          {% csrf_token %}
+          <div class="input-group input-group-sm">
+            <input type="text" name="username" class="form-control" placeholder="PPPoE username">
+            <button type="submit" class="btn btn-success">Enable</button>
+          </div>
+        </form>
+        <form method="post" action="{% url 'network:mikrotik_user_disable' device.pk %}">
+          {% csrf_token %}
+          <div class="input-group input-group-sm">
+            <input type="text" name="username" class="form-control" placeholder="PPPoE username">
+            <button type="submit" class="btn btn-danger">Disable</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Right: active sessions + linked connections -->
+  <div class="col-md-8">
+    {% if device.is_mikrotik %}
+    <div class="card shadow-sm border-0 mb-3">
+      <div class="card-header bg-white fw-semibold border-0 pt-3 d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-activity me-1 text-success"></i>Active PPPoE Sessions</span>
+        <span class="badge bg-success">{{ sessions|length }}</span>
+      </div>
+      {% if sessions_error %}
+      <div class="card-body">
+        <div class="alert alert-warning py-2 mb-0 small">
+          <i class="bi bi-exclamation-triangle me-1"></i>Could not fetch sessions: {{ sessions_error }}
+        </div>
+      </div>
+      {% elif sessions %}
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead><tr><th>Username</th><th>IP</th><th>MAC</th><th>Uptime</th><th>Rx / Tx</th></tr></thead>
+          <tbody>
+            {% for s in sessions %}
+            <tr>
+              <td class="fw-semibold small">{{ s.name }}</td>
+              <td class="small">{{ s.address|default:'—' }}</td>
+              <td class="text-muted small">{{ s.caller-id|default:'' }}</td>
+              <td class="text-muted small">{{ s.uptime|default:'—' }}</td>
+              <td class="text-muted small">{{ s.rx|default:'—' }} / {{ s.tx|default:'—' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="card-body text-muted small">No active sessions.</div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Connections linked to this router -->
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-white fw-semibold border-0 pt-3 d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-diagram-3 me-1 text-primary"></i>Linked Connections</span>
+        <span class="badge bg-primary">{{ connections.count }}</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead><tr><th>Username</th><th>Customer</th><th>Package</th><th>Status</th><th>Expiry</th><th></th></tr></thead>
+          <tbody>
+            {% for c in connections %}
+            <tr>
+              <td class="fw-semibold small">{{ c.username }}</td>
+              <td><a href="{% url 'customers:customer_detail' c.customer.pk %}" class="text-decoration-none small">{{ c.customer.name }}</a></td>
+              <td class="text-muted small">{{ c.package.name|default:'—' }}</td>
+              <td><span class="badge badge-{{ c.status }}">{{ c.get_status_display }}</span></td>
+              <td class="text-muted small">{{ c.expiry_date|default:'—' }}</td>
+              <td>
+                {% if device.is_mikrotik %}
+                <form method="post" action="{% url 'network:mikrotik_user_enable' device.pk %}" class="d-inline">
+                  {% csrf_token %}<input type="hidden" name="username" value="{{ c.username }}">
+                  <button type="submit" class="btn btn-xs btn-outline-success btn-sm py-0 px-1" title="Enable"><i class="bi bi-play-fill"></i></button>
+                </form>
+                <form method="post" action="{% url 'network:mikrotik_user_disable' device.pk %}" class="d-inline">
+                  {% csrf_token %}<input type="hidden" name="username" value="{{ c.username }}">
+                  <button type="submit" class="btn btn-xs btn-outline-danger btn-sm py-0 px-1" title="Disable"><i class="bi bi-pause-fill"></i></button>
+                </form>
+                {% endif %}
+                <a href="{% url 'customers:connection_edit' c.pk %}" class="btn btn-sm btn-outline-secondary py-0 px-1"><i class="bi bi-pencil"></i></a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-muted text-center py-3 small">No connections linked to this router.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Test connection toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:1100">
+  <div id="testToast" class="toast">
+    <div class="toast-header">
+      <i class="bi me-2" id="testToastIcon"></i>
+      <strong class="me-auto">Connection Test</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+    </div>
+    <div class="toast-body" id="testToastBody"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const testBtn = document.getElementById('testConnBtn');
+if (testBtn) {
+  testBtn.addEventListener('click', function () {
+    const origHtml = this.innerHTML;
+    this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Testing…';
+    this.disabled = true;
+
+    fetch(this.dataset.url, {
+      method: 'POST',
+      headers: {'X-CSRFToken': '{{ csrf_token }}'},
+    })
+    .then(r => r.json())
+    .then(data => {
+      const toast = document.getElementById('testToast');
+      document.getElementById('testToastBody').textContent = data.message;
+      document.getElementById('testToastIcon').className =
+        data.success ? 'bi bi-check-circle-fill text-success me-2' : 'bi bi-x-circle-fill text-danger me-2';
+      bootstrap.Toast.getOrCreateInstance(toast, {delay: 6000}).show();
+    })
+    .catch(() => alert('Request failed'))
+    .finally(() => { this.innerHTML = origHtml; this.disabled = false; });
+  });
+}
+</script>
+{% endblock %}

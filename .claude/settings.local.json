@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip --version)",
+      "Bash(pip install *)",
+      "Bash(django-admin startproject *)",
+      "Bash(python manage.py startapp accounts)",
+      "Bash(python manage.py startapp customers)",
+      "Bash(python manage.py startapp packages)",
+      "Bash(python manage.py startapp billing)",
+      "Bash(python manage.py startapp network)",
+      "Bash(python manage.py startapp tickets)",
+      "Bash(python manage.py startapp home)",
+      "Bash(python manage.py makemigrations)",
+      "Bash(python manage.py migrate)",
+      "Bash(python create_superuser.py)",
+      "Bash(python manage.py check)",
+      "Bash(python manage.py expire_connections --dry-run)"
+    ]
+  }
+}

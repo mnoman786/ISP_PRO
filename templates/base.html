@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}ISP CRM{% endblock %} — NetCRM</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-light">
+
+{% if user.is_authenticated %}
+<!-- Sidebar -->
+<div class="d-flex" id="wrapper">
+  <nav id="sidebar" class="sidebar bg-dark text-white d-flex flex-column">
+    <div class="sidebar-brand px-3 py-4 border-bottom border-secondary">
+      <h5 class="mb-0 fw-bold text-white"><i class="bi bi-wifi me-2 text-primary"></i>NetCRM</h5>
+      <small class="text-muted">ISP Management</small>
+    </div>
+    <ul class="nav flex-column mt-2 flex-grow-1">
+      <li class="nav-item">
+        <a href="{% url 'home:dashboard' %}" class="nav-link text-white {% if request.resolver_match.app_name == 'home' %}active bg-primary rounded mx-2{% endif %}">
+          <i class="bi bi-speedometer2 me-2"></i>Dashboard
+        </a>
+      </li>
+      <li class="nav-item mt-1">
+        <span class="nav-label px-3 text-muted small text-uppercase">Customers</span>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'customers:customer_list' %}" class="nav-link text-white {% if request.resolver_match.url_name == 'customer_list' or request.resolver_match.url_name == 'customer_detail' %}active bg-primary rounded mx-2{% endif %}">
+          <i class="bi bi-people me-2"></i>Customers
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'customers:connection_list' %}" class="nav-link text-white {% if request.resolver_match.url_name == 'connection_list' %}active bg-primary rounded mx-2{% endif %}">
+          <i class="bi bi-diagram-3 me-2"></i>Connections
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'customers:area_list' %}" class="nav-link text-white {% if request.resolver_match.url_name == 'area_list' %}active bg-primary rounded mx-2{% endif %}">
+          <i class="bi bi-geo-alt me-2"></i>Areas
+        </a>
+      </li>
+      <li class="nav-item mt-1">
+        <span class="nav-label px-3 text-muted small text-uppercase">Billing</span>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'billing:invoice_list' %}" class="nav-link text-white {% if request.resolver_match.url_name == 'invoice_list' or request.resolver_match.url_name == 'invoice_detail' %}active bg-primary rounded mx-2{% endif %}">
+          <i class="bi bi-receipt me-2"></i>Invoices
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'billing:expense_list' %}" class="nav-link text-white {% if request.resolver_match.url_name == 'expense_list' %}active bg-primary rounded mx-2{% endif %}">
+          <i class="bi bi-cash-stack me-2"></i>Expenses
+        </a>
+      </li>
+      <li class="nav-item mt-1">
+        <span class="nav-label px-3 text-muted small text-uppercase">Network</span>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'packages:package_list' %}" class="nav-link text-white {% if request.resolver_match.app_name == 'packages' %}active bg-primary rounded mx-2{% endif %}">
+          <i class="bi bi-boxes me-2"></i>Packages
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'network:device_list' %}" class="nav-link text-white {% if request.resolver_match.url_name == 'device_list' %}active bg-primary rounded mx-2{% endif %}">
+          <i class="bi bi-router me-2"></i>Devices
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'network:ippool_list' %}" class="nav-link text-white {% if request.resolver_match.url_name == 'ippool_list' %}active bg-primary rounded mx-2{% endif %}">
+          <i class="bi bi-hdd-network me-2"></i>IP Pools
+        </a>
+      </li>
+      <li class="nav-item mt-1">
+        <span class="nav-label px-3 text-muted small text-uppercase">Support</span>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'tickets:ticket_list' %}" class="nav-link text-white {% if request.resolver_match.app_name == 'tickets' %}active bg-primary rounded mx-2{% endif %}">
+          <i class="bi bi-ticket-detailed me-2"></i>Tickets
+        </a>
+      </li>
+      {% if user.is_manager %}
+      <li class="nav-item mt-1">
+        <span class="nav-label px-3 text-muted small text-uppercase">Admin</span>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'accounts:staff_list' %}" class="nav-link text-white {% if request.resolver_match.app_name == 'accounts' and request.resolver_match.url_name != 'profile' %}active bg-primary rounded mx-2{% endif %}">
+          <i class="bi bi-person-badge me-2"></i>Staff
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+    <div class="px-3 py-3 border-top border-secondary">
+      <div class="d-flex align-items-center">
+        {% if user.avatar %}
+          <img src="{{ user.avatar.url }}" class="rounded-circle me-2" width="32" height="32" style="object-fit:cover">
+        {% else %}
+          <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-2" style="width:32px;height:32px;font-size:14px;color:#fff">
+            {{ user.username|first|upper }}
+          </div>
+        {% endif %}
+        <div class="flex-grow-1 overflow-hidden">
+          <div class="text-white small fw-semibold text-truncate">{{ user.get_full_name|default:user.username }}</div>
+          <div class="text-muted" style="font-size:11px">{{ user.get_role_display }}</div>
+        </div>
+        <a href="{% url 'accounts:logout' %}" class="text-muted ms-2" title="Logout"><i class="bi bi-box-arrow-right"></i></a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <div id="page-content" class="flex-grow-1 d-flex flex-column" style="min-width:0">
+    <!-- Top navbar -->
+    <nav class="navbar navbar-light bg-white border-bottom px-3 py-2">
+      <button class="btn btn-sm btn-outline-secondary me-3" id="sidebarToggle">
+        <i class="bi bi-list"></i>
+      </button>
+      <nav aria-label="breadcrumb" class="flex-grow-1">
+        <ol class="breadcrumb mb-0 small">
+          {% block breadcrumb %}
+          <li class="breadcrumb-item"><a href="{% url 'home:dashboard' %}">Home</a></li>
+          {% endblock %}
+        </ol>
+      </nav>
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'tickets:ticket_create' %}" class="btn btn-sm btn-outline-warning" title="New Ticket"><i class="bi bi-ticket-detailed"></i></a>
+        <a href="{% url 'customers:customer_create' %}" class="btn btn-sm btn-primary" title="New Customer"><i class="bi bi-person-plus"></i></a>
+        <a href="{% url 'accounts:profile' %}" class="btn btn-sm btn-outline-secondary" title="Profile"><i class="bi bi-person-circle"></i></a>
+      </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="px-4 pt-3">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show py-2" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Page content -->
+    <main class="flex-grow-1 p-4">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+{% else %}
+{% if messages %}
+<div class="container mt-3">
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% block unauthenticated_content %}{% endblock %}
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="/static/js/app.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

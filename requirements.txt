@@ -1,0 +1,8 @@
+Django==4.2.30
+django-crispy-forms==2.5
+crispy-bootstrap5==2026.3
+Pillow==11.2.1
+python-decouple==3.8
+django-widget-tweaks==1.5.1
+routeros-api
+PyMySQL

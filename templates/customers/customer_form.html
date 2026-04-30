@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}{{ title }}{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'home:dashboard' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'customers:customer_list' %}">Customers</a></li>
+<li class="breadcrumb-item active">{{ title }}</li>
+{% endblock %}
+{% block content %}
+<div class="page-header"><h4>{{ title }}</h4></div>
+<div class="form-section" style="max-width:760px">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label fw-semibold small">Full Name *</label>
+        {% render_field form.name class="form-control" %}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label fw-semibold small">Phone *</label>
+        {% render_field form.phone class="form-control" %}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label fw-semibold small">Alt Phone</label>
+        {% render_field form.phone_alt class="form-control" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">Email</label>
+        {% render_field form.email class="form-control" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">CNIC/ID</label>
+        {% render_field form.cnic class="form-control" placeholder="e.g. 35202-1234567-8" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">Area</label>
+        {% render_field form.area class="form-select" %}
+      </div>
+      <div class="col-md-8">
+        <label class="form-label fw-semibold small">Address *</label>
+        {% render_field form.address class="form-control" rows="3" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">Status</label>
+        {% render_field form.status class="form-select" %}
+        <label class="form-label fw-semibold small mt-3">Photo</label>
+        {% render_field form.photo class="form-control" %}
+      </div>
+      <div class="col-12">
+        <label class="form-label fw-semibold small">Notes</label>
+        {% render_field form.notes class="form-control" rows="3" %}
+      </div>
+    </div>
+    <div class="d-flex gap-2 mt-4">
+      <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Save Customer</button>
+      <a href="{% if obj %}{% url 'customers:customer_detail' obj.pk %}{% else %}{% url 'customers:customer_list' %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+/* Sidebar */
+#wrapper { min-height: 100vh; }
+
+#sidebar {
+  width: 240px;
+  min-height: 100vh;
+  transition: width 0.2s;
+  overflow-x: hidden;
+  flex-shrink: 0;
+}
+
+#sidebar.collapsed { width: 0; }
+
+#sidebar .nav-link {
+  padding: 0.45rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 0;
+  transition: background 0.15s;
+}
+#sidebar .nav-link:hover { background: rgba(255,255,255,0.07); border-radius: 6px; margin: 0 8px; }
+#sidebar .nav-link.active { font-weight: 600; }
+#sidebar .nav-label { font-size: 0.7rem; letter-spacing: 0.08em; display: block; margin-top: 0.5rem; margin-bottom: 0.25rem; }
+
+/* Cards */
+.stat-card { border: none; border-radius: 12px; transition: transform 0.15s, box-shadow 0.15s; }
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important; }
+.stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+
+/* Status badges */
+.badge-active { background: #d1fae5; color: #065f46; }
+.badge-inactive { background: #f3f4f6; color: #6b7280; }
+.badge-suspended { background: #fee2e2; color: #991b1b; }
+.badge-expired { background: #fef3c7; color: #92400e; }
+.badge-paid { background: #d1fae5; color: #065f46; }
+.badge-unpaid { background: #fee2e2; color: #991b1b; }
+.badge-partial { background: #fef3c7; color: #92400e; }
+.badge-overdue { background: #fecaca; color: #7f1d1d; }
+
+/* Tables */
+.table th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: #6b7280; font-weight: 600; background: #f9fafb; }
+.table td { vertical-align: middle; font-size: 0.875rem; }
+
+/* Page header */
+.page-header { margin-bottom: 1.5rem; }
+.page-header h4 { font-weight: 700; color: #1f2937; margin-bottom: 0.25rem; }
+
+/* Forms */
+.form-section { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+
+/* Ticket priority */
+.priority-low { color: #6b7280; }
+.priority-medium { color: #d97706; }
+.priority-high { color: #dc2626; }
+.priority-critical { color: #7f1d1d; font-weight: 700; }
+
+/* Avatar */
+.avatar-sm { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+
+@media (max-width: 768px) {
+  #sidebar { width: 0; position: fixed; z-index: 1000; height: 100vh; }
+  #sidebar.mobile-open { width: 240px; }
+  #page-content { width: 100%; }
+}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}Record Payment{% endblock %}
+{% block content %}
+<div class="page-header"><h4>Record Payment{% if invoice %} — Invoice #{{ invoice.invoice_number }}{% endif %}</h4></div>
+{% if invoice %}
+<div class="alert alert-info py-2 mb-3">
+  <strong>{{ invoice.customer.name }}</strong> &mdash; Balance: <strong>PKR {{ invoice.balance|floatformat:2 }}</strong>
+</div>
+{% endif %}
+<div class="form-section" style="max-width:520px">
+  <form method="post">{% csrf_token %}
+    <div class="mb-3"><label class="form-label fw-semibold small">Invoice *</label>{% render_field form.invoice class="form-select" %}</div>
+    <div class="row g-3">
+      <div class="col-md-6"><label class="form-label fw-semibold small">Amount (PKR) *</label>{% render_field form.amount class="form-control" %}</div>
+      <div class="col-md-6"><label class="form-label fw-semibold small">Payment Date *</label>{% render_field form.payment_date class="form-control" %}</div>
+      <div class="col-md-6"><label class="form-label fw-semibold small">Method</label>{% render_field form.method class="form-select" %}</div>
+      <div class="col-md-6"><label class="form-label fw-semibold small">Reference No.</label>{% render_field form.reference_no class="form-control" %}</div>
+      <div class="col-12"><label class="form-label fw-semibold small">Notes</label>{% render_field form.notes class="form-control" rows="2" %}</div>
+    </div>
+    <div class="d-flex gap-2 mt-4">
+      <button type="submit" class="btn btn-success"><i class="bi bi-cash me-1"></i>Record Payment</button>
+      <a href="{% if invoice %}{% url 'billing:invoice_detail' invoice.pk %}{% else %}{% url 'billing:invoice_list' %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

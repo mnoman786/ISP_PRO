@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Delete Package{% endblock %}
+{% block content %}
+{% include 'components/delete_card.html' with obj_type='Package' cancel_url='/packages/' %}
+{% endblock %}

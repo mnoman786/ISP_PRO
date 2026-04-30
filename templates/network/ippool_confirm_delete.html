@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Delete IP Pool{% endblock %}
+{% block content %}
+{% include 'components/delete_card.html' with obj_type='IP Pool' cancel_url='/network/ip-pools/' %}
+{% endblock %}
