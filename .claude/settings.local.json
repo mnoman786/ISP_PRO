@@ -17,7 +17,8 @@
       "Bash(python manage.py check)",
       "Bash(python manage.py expire_connections --dry-run)",
       "Bash(ssh root@162.217.248.75 'python3 -c \" *)",
-      "Bash(python manage.py makemigrations network)"
+      "Bash(python manage.py makemigrations network)",
+      "Read(//etc/freeradius/3.0/**)"
     ]
   }
 }
