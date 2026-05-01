@@ -10,6 +10,7 @@ class NetworkDeviceForm(forms.ModelForm):
             'location', 'area', 'status', 'install_date', 'notes',
             # MikroTik fields
             'is_mikrotik', 'api_host', 'api_port', 'api_username', 'api_password', 'api_use_ssl',
+            'radius_secret',
         ]
         widgets = {
             'install_date': forms.DateInput(attrs={'type': 'date'}),

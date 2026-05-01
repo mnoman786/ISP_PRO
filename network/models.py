@@ -47,6 +47,10 @@ class NetworkDevice(models.Model):
     api_username = models.CharField(max_length=100, blank=True, verbose_name='API Username')
     api_password = models.CharField(max_length=100, blank=True, verbose_name='API Password')
     api_use_ssl = models.BooleanField(default=False, verbose_name='Use SSL')
+    radius_secret = models.CharField(
+        max_length=100, blank=True, verbose_name='RADIUS Secret',
+        help_text='Shared secret between this router and FreeRADIUS (NAS secret)',
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 

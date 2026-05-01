@@ -69,6 +69,9 @@ DATABASES = {
 # FreeRADIUS integration — set RADIUS_ENABLED=True in .env to activate
 RADIUS_ENABLED = config('RADIUS_ENABLED', default=False, cast=bool)
 
+RADIUS_CLIENTS_CONF = config('RADIUS_CLIENTS_CONF', default='/etc/freeradius/3.0/clients.conf')
+RADIUS_DEFAULT_SECRET = config('RADIUS_DEFAULT_SECRET', default='testing123')
+
 if RADIUS_ENABLED:
     import pymysql
     pymysql.install_as_MySQLdb()

@@ -6,6 +6,7 @@ from django.views.decorators.http import require_POST
 from .models import NetworkDevice, IPPool
 from .forms import NetworkDeviceForm, IPPoolForm
 from .mikrotik import test_connection, get_active_sessions, enable_pppoe_user, disable_pppoe_user
+from radius.clients import add_or_update_client, remove_client
 
 
 @login_required
@@ -23,7 +24,11 @@ def device_create(request):
     if request.method == 'POST':
         form = NetworkDeviceForm(request.POST)
         if form.is_valid():
-            form.save()
+            device = form.save()
+            if device.is_mikrotik:
+                ok, msg = add_or_update_client(device)
+                if not ok:
+                    messages.warning(request, f'Device added but RADIUS clients.conf update failed: {msg}')
             messages.success(request, 'Device added.')
             return redirect('network:device_list')
     else:
@@ -37,7 +42,11 @@ def device_edit(request, pk):
     if request.method == 'POST':
         form = NetworkDeviceForm(request.POST, instance=device)
         if form.is_valid():
-            form.save()
+            device = form.save()
+            if device.is_mikrotik:
+                ok, msg = add_or_update_client(device)
+                if not ok:
+                    messages.warning(request, f'Device updated but RADIUS clients.conf update failed: {msg}')
             messages.success(request, 'Device updated.')
             return redirect('network:device_list')
     else:
@@ -49,6 +58,7 @@ def device_edit(request, pk):
 def device_delete(request, pk):
     device = get_object_or_404(NetworkDevice, pk=pk)
     if request.method == 'POST':
+        remove_client(device)
         device.delete()
         messages.success(request, 'Device deleted.')
         return redirect('network:device_list')

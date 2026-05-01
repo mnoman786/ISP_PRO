@@ -46,6 +46,7 @@
           </div>
           <div class="col-md-6"><label class="form-label fw-semibold small">API Username</label>{% render_field form.api_username class="form-control" placeholder="admin" %}</div>
           <div class="col-md-6"><label class="form-label fw-semibold small">API Password</label>{% render_field form.api_password class="form-control" %}</div>
+          <div class="col-md-6"><label class="form-label fw-semibold small">RADIUS Secret <span class="text-muted fw-normal">(NAS shared secret)</span></label>{% render_field form.radius_secret class="form-control" placeholder="e.g. testing123" %}<div class="form-text">Must match the secret in FreeRADIUS clients.conf for this router.</div></div>
         </div>
       </div>
     </div>
