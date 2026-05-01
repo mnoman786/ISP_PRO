@@ -139,8 +139,18 @@ def get_active_sessions(device):
     """Return list of currently active PPPoE sessions from the router."""
     try:
         api = _connect(device)
-        sessions = api.get_resource('/ppp/active').get()
+        raw = api.get_resource('/ppp/active').get()
         api.disconnect()
+        sessions = []
+        for s in raw:
+            sessions.append({
+                'name': s.get('name', ''),
+                'address': s.get('address', '—'),
+                'caller_id': s.get('caller-id', ''),
+                'uptime': s.get('uptime', '—'),
+                'rx': s.get('rx-byte', '—'),
+                'tx': s.get('tx-byte', '—'),
+            })
         return True, sessions
     except Exception as e:
         return False, str(e)
