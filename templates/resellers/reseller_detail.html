@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% block title %}{{ reseller.name }}{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'home:dashboard' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'resellers:reseller_list' %}">Resellers</a></li>
+<li class="breadcrumb-item active">{{ reseller.name }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <div>
+    <h4>
+      <i class="bi bi-diagram-2 me-2 text-primary"></i>{{ reseller.name }}
+      <span class="badge ms-1
+        {% if reseller.role == 'franchise' %}bg-primary
+        {% elif reseller.role == 'dealer' %}bg-info text-dark
+        {% else %}bg-secondary{% endif %} fs-6">
+        {{ reseller.get_role_display }}
+      </span>
+    </h4>
+    {% if reseller.parent %}
+    <small class="text-muted">Under: {{ reseller.parent.name }}</small>
+    {% endif %}
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'resellers:reseller_credit' reseller.pk %}" class="btn btn-success btn-sm">
+      <i class="bi bi-plus-circle me-1"></i>Add Balance
+    </a>
+    {% if reseller.children.exists %}
+    <a href="{% url 'resellers:reseller_transfer' reseller.pk %}" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-arrow-left-right me-1"></i>Transfer
+    </a>
+    {% endif %}
+    <a href="{% url 'resellers:reseller_edit' reseller.pk %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-pencil me-1"></i>Edit
+    </a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <!-- Left: info + sub-resellers + customers -->
+  <div class="col-md-4">
+    <!-- Balance card -->
+    <div class="card border-0 shadow-sm mb-3" style="background: linear-gradient(135deg,#1a73e8,#0d47a1); color:#fff">
+      <div class="card-body py-4 text-center">
+        <div class="small opacity-75 mb-1">Current Balance</div>
+        <div class="display-6 fw-bold">PKR {{ reseller.balance|floatformat:0 }}</div>
+        {% if reseller.balance <= 0 %}
+        <div class="badge bg-danger mt-2">Cannot Add Users</div>
+        {% elif reseller.balance < 500 %}
+        <div class="badge bg-warning text-dark mt-2">Low Balance</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white fw-semibold border-0 pt-3 small">
+        <i class="bi bi-info-circle me-1 text-primary"></i>Info
+      </div>
+      <div class="card-body">
+        <table class="table table-borderless mb-0 small">
+          <tr><td class="text-muted">Phone</td><td>{{ reseller.phone|default:'—' }}</td></tr>
+          <tr><td class="text-muted">Email</td><td>{{ reseller.email|default:'—' }}</td></tr>
+          <tr><td class="text-muted">Area</td><td>{{ reseller.area.name|default:'—' }}</td></tr>
+          <tr><td class="text-muted">Address</td><td>{{ reseller.address|default:'—' }}</td></tr>
+          <tr><td class="text-muted">Login</td><td>{{ reseller.user.username|default:'—' }}</td></tr>
+          <tr><td class="text-muted">Status</td>
+            <td>{% if reseller.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td>
+          </tr>
+          <tr><td class="text-muted">Since</td><td>{{ reseller.created_at|date:"d M Y" }}</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sub-resellers -->
+    {% if children %}
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white fw-semibold border-0 pt-3 d-flex justify-content-between small">
+        <span><i class="bi bi-diagram-3 me-1 text-info"></i>Sub-Resellers</span>
+        <span class="badge bg-info text-dark">{{ children.count }}</span>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for child in children %}
+        <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+          <div>
+            <a href="{% url 'resellers:reseller_detail' child.pk %}" class="text-decoration-none fw-semibold small">{{ child.name }}</a>
+            <div class="text-muted" style="font-size:11px">{{ child.get_role_display }}</div>
+          </div>
+          <span class="badge bg-light text-dark border">PKR {{ child.balance|floatformat:0 }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Right: customers + transactions -->
+  <div class="col-md-8">
+    <!-- Customers -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white fw-semibold border-0 pt-3 d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-people me-1 text-primary"></i>Customers</span>
+        <span class="badge bg-primary">{{ reseller.customer_count }}</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead><tr><th>Name</th><th>Phone</th><th>Area</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            {% for c in customers %}
+            <tr>
+              <td><a href="{% url 'customers:customer_detail' c.pk %}" class="text-decoration-none fw-semibold small">{{ c.name }}</a></td>
+              <td class="text-muted small">{{ c.phone }}</td>
+              <td class="text-muted small">{{ c.area.name|default:'—' }}</td>
+              <td>
+                <span class="badge {% if c.status == 'active' %}bg-success{% elif c.status == 'suspended' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                  {{ c.get_status_display }}
+                </span>
+              </td>
+              <td><a href="{% url 'customers:customer_detail' c.pk %}" class="btn btn-sm btn-outline-secondary py-0 px-1"><i class="bi bi-eye"></i></a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-muted py-3 small">No customers yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if reseller.customer_count > 20 %}
+      <div class="card-footer text-muted small text-center">Showing 20 of {{ reseller.customer_count }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Transaction history -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-semibold border-0 pt-3">
+        <i class="bi bi-clock-history me-1 text-warning"></i>Balance History
+      </div>
+      <div class="table-responsive">
+        <table class="table mb-0 small">
+          <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Balance After</th><th>Note</th><th>By</th></tr></thead>
+          <tbody>
+            {% for t in transactions %}
+            <tr>
+              <td class="text-muted">{{ t.created_at|date:"d M, H:i" }}</td>
+              <td>
+                <span class="badge {% if t.type == 'credit' %}bg-success{% else %}bg-danger{% endif %}">
+                  {{ t.type|title }}
+                </span>
+              </td>
+              <td class="fw-semibold {% if t.type == 'credit' %}text-success{% else %}text-danger{% endif %}">
+                {% if t.type == 'credit' %}+{% else %}-{% endif %}PKR {{ t.amount|floatformat:0 }}
+              </td>
+              <td>PKR {{ t.balance_after|floatformat:0 }}</td>
+              <td class="text-muted">{{ t.note|default:'—' }}</td>
+              <td class="text-muted">{{ t.created_by.get_full_name|default:t.created_by.username|default:'—' }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-3">No transactions yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

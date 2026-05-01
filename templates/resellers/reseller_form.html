@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}{{ title }}{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'home:dashboard' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'resellers:reseller_list' %}">Resellers</a></li>
+<li class="breadcrumb-item active">{{ title }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header"><h4>{{ title }}</h4></div>
+<div class="form-section" style="max-width:720px">
+  <form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger py-2 small">{{ form.non_field_errors }}</div>
+    {% endif %}
+    <div class="row g-3">
+      <div class="col-md-8">
+        <label class="form-label fw-semibold small">Name *</label>
+        {% render_field form.name class="form-control" placeholder="e.g. Noman Traders" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">Role *</label>
+        {% render_field form.role class="form-select" %}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label fw-semibold small">Parent (Franchise / Dealer)</label>
+        {% render_field form.parent class="form-select" %}
+        <div class="form-text">Leave blank for top-level franchises.</div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label fw-semibold small">Login Account</label>
+        {% render_field form.user class="form-select" %}
+        <div class="form-text">Optional — lets reseller log in and manage their customers.</div>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">Phone</label>
+        {% render_field form.phone class="form-control" placeholder="03xx-xxxxxxx" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">Email</label>
+        {% render_field form.email class="form-control" %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">Area</label>
+        {% render_field form.area class="form-select" %}
+      </div>
+      <div class="col-12">
+        <label class="form-label fw-semibold small">Address</label>
+        {% render_field form.address class="form-control" rows="2" %}
+      </div>
+      <div class="col-12">
+        <div class="form-check">
+          {% render_field form.is_active class="form-check-input" %}
+          <label class="form-check-label fw-semibold small">Active</label>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex gap-2 mt-4">
+      <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Save</button>
+      <a href="{% if obj %}{% url 'resellers:reseller_detail' obj.pk %}{% else %}{% url 'resellers:reseller_list' %}{% endif %}"
+         class="btn btn-outline-secondary">Cancel</a>
+      {% if obj %}
+      <a href="{% url 'resellers:reseller_delete' obj.pk %}" class="btn btn-outline-danger ms-auto">
+        <i class="bi bi-trash me-1"></i>Delete
+      </a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -8,6 +8,18 @@
 {% endblock %}
 {% block content %}
 <div class="page-header"><h4>{{ title }}</h4></div>
+{% if reseller_balance %}
+<div class="alert {% if reseller_balance.balance <= 0 %}alert-danger{% elif reseller_balance.balance < 500 %}alert-warning{% else %}alert-info{% endif %} py-2 mb-3" style="max-width:760px">
+  <i class="bi bi-wallet2 me-1"></i>
+  <strong>{{ reseller_balance.name }}</strong> balance:
+  <strong>PKR {{ reseller_balance.balance|floatformat:0 }}</strong>
+  {% if reseller_balance.balance <= 0 %}
+  — <span class="text-danger fw-bold">Cannot add connection (no balance)</span>
+  {% elif reseller_balance.balance < 500 %}
+  — <span class="text-warning fw-bold">Low balance</span>
+  {% endif %}
+</div>
+{% endif %}
 <div class="form-section" style="max-width:760px">
   <form method="post">
     {% csrf_token %}

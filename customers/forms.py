@@ -11,11 +11,17 @@ class AreaForm(forms.ModelForm):
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
-        fields = ['name', 'phone', 'phone_alt', 'email', 'cnic', 'address', 'area', 'photo', 'status', 'notes']
+        fields = ['name', 'phone', 'phone_alt', 'email', 'cnic', 'address', 'area', 'reseller', 'photo', 'status', 'notes']
         widgets = {
             'address': forms.Textarea(attrs={'rows': 3}),
             'notes': forms.Textarea(attrs={'rows': 3}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from resellers.models import Reseller
+        self.fields['reseller'].queryset = Reseller.objects.filter(is_active=True).select_related('parent')
+        self.fields['reseller'].empty_label = '— No Reseller (Direct) —'
 
 
 class ConnectionForm(forms.ModelForm):

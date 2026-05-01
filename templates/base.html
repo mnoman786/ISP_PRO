@@ -42,6 +42,11 @@
           <i class="bi bi-geo-alt me-2"></i>Areas
         </a>
       </li>
+      <li class="nav-item">
+        <a href="{% url 'resellers:reseller_list' %}" class="nav-link text-white {% if request.resolver_match.app_name == 'resellers' %}active bg-primary rounded mx-2{% endif %}">
+          <i class="bi bi-diagram-2 me-2"></i>Resellers
+        </a>
+      </li>
       <li class="nav-item mt-1">
         <span class="nav-label px-3 text-muted small text-uppercase">Billing</span>
       </li>

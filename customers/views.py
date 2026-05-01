@@ -102,7 +102,24 @@ def connection_create(request, customer_pk=None):
     if request.method == 'POST':
         form = ConnectionForm(request.POST)
         if form.is_valid():
-            connection = form.save()
+            connection = form.save(commit=False)
+            # Balance check: if customer has a reseller, deduct package price
+            reseller = connection.customer.reseller
+            if reseller and connection.package:
+                price = connection.package.price
+                if not reseller.can_afford(price):
+                    messages.error(
+                        request,
+                        f'Insufficient balance. {reseller.name} has PKR {reseller.balance} '
+                        f'but package costs PKR {price}.'
+                    )
+                    return render(request, 'customers/connection_form.html', {
+                        'form': form, 'title': 'Add Connection', 'customer': customer,
+                    })
+                connection.save()
+                reseller.debit(price, note=f'New connection: {connection.username}', created_by=request.user)
+            else:
+                connection.save()
             mt_ok, mt_msg = sync_connection(connection)
             r_ok, r_msg = radius.push_user(connection)
             if connection.mikrotik_router and not mt_ok:
@@ -115,8 +132,13 @@ def connection_create(request, customer_pk=None):
     else:
         initial = {'customer': customer} if customer else {}
         form = ConnectionForm(initial=initial)
+    # Pass reseller balance info to template
+    reseller_balance = None
+    if customer and customer.reseller:
+        reseller_balance = customer.reseller
     return render(request, 'customers/connection_form.html', {
         'form': form, 'title': 'Add Connection', 'customer': customer,
+        'reseller_balance': reseller_balance,
     })
 
 

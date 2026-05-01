@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Delete {{ obj.name }}{% endblock %}
+{% block content %}
+<div class="page-header"><h4>Delete Reseller</h4></div>
+<div class="form-section" style="max-width:480px">
+  <div class="alert alert-danger">
+    <strong>Are you sure?</strong> This will permanently delete <strong>{{ obj.name }}</strong>.
+    Their customers will not be deleted but will be unlinked.
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-danger"><i class="bi bi-trash me-1"></i>Yes, Delete</button>
+      <a href="{% url 'resellers:reseller_detail' obj.pk %}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

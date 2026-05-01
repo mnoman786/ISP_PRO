@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Resellers{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'home:dashboard' %}">Home</a></li>
+<li class="breadcrumb-item active">Resellers</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <div>
+    <h4><i class="bi bi-diagram-2 me-2 text-primary"></i>Resellers</h4>
+    <small class="text-muted">Franchise → Dealer → Sub-Dealer hierarchy</small>
+  </div>
+  <a href="{% url 'resellers:reseller_create' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i>Add Reseller
+  </a>
+</div>
+
+<!-- Summary cards -->
+<div class="row g-3 mb-3">
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body py-3">
+        <div class="text-muted small">Total Resellers</div>
+        <div class="fw-bold fs-4">{{ resellers.count }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body py-3">
+        <div class="text-muted small">Total Balance Held</div>
+        <div class="fw-bold fs-4 text-success">PKR {{ total_balance|floatformat:0 }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body py-3">
+        <div class="text-muted small">Franchises</div>
+        <div class="fw-bold fs-4">{{ resellers|length }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body py-3">
+        <div class="text-muted small">Active</div>
+        <div class="fw-bold fs-4 text-primary">{{ resellers|length }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Parent</th>
+          <th>Area</th>
+          <th>Balance</th>
+          <th>Customers</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in resellers %}
+        <tr>
+          <td>
+            <a href="{% url 'resellers:reseller_detail' r.pk %}" class="fw-semibold text-decoration-none">{{ r.name }}</a>
+            {% if r.phone %}<div class="text-muted small">{{ r.phone }}</div>{% endif %}
+          </td>
+          <td>
+            <span class="badge
+              {% if r.role == 'franchise' %}bg-primary
+              {% elif r.role == 'dealer' %}bg-info text-dark
+              {% else %}bg-secondary{% endif %}">
+              {{ r.get_role_display }}
+            </span>
+          </td>
+          <td class="text-muted small">{{ r.parent.name|default:'—' }}</td>
+          <td class="text-muted small">{{ r.area.name|default:'—' }}</td>
+          <td>
+            <span class="fw-semibold {% if r.balance <= 0 %}text-danger{% elif r.balance < 500 %}text-warning{% else %}text-success{% endif %}">
+              PKR {{ r.balance|floatformat:0 }}
+            </span>
+          </td>
+          <td class="text-muted small">{{ r.customer_count }}</td>
+          <td>
+            {% if r.is_active %}
+            <span class="badge bg-success-subtle text-success">Active</span>
+            {% else %}
+            <span class="badge bg-secondary-subtle text-secondary">Inactive</span>
+            {% endif %}
+          </td>
+          <td class="text-end">
+            <a href="{% url 'resellers:reseller_credit' r.pk %}" class="btn btn-xs btn-outline-success btn-sm py-0 px-2" title="Add Balance">
+              <i class="bi bi-plus-circle"></i>
+            </a>
+            <a href="{% url 'resellers:reseller_edit' r.pk %}" class="btn btn-xs btn-outline-secondary btn-sm py-0 px-2">
+              <i class="bi bi-pencil"></i>
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="text-center text-muted py-4">No resellers yet. <a href="{% url 'resellers:reseller_create' %}">Add one</a>.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

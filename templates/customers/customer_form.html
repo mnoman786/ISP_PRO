@@ -36,6 +36,11 @@
         <label class="form-label fw-semibold small">Area</label>
         {% render_field form.area class="form-select" %}
       </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold small">Reseller / Dealer</label>
+        {% render_field form.reseller class="form-select" %}
+        <div class="form-text">Franchise, dealer or sub-dealer who owns this customer.</div>
+      </div>
       <div class="col-md-8">
         <label class="form-label fw-semibold small">Address *</label>
         {% render_field form.address class="form-control" rows="3" %}

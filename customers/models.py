@@ -31,6 +31,11 @@ class Customer(models.Model):
     cnic = models.CharField(max_length=20, blank=True, verbose_name='CNIC/ID')
     address = models.TextField()
     area = models.ForeignKey(Area, on_delete=models.SET_NULL, null=True, blank=True, related_name='customers')
+    reseller = models.ForeignKey(
+        'resellers.Reseller', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='customers',
+        help_text='Franchise / Dealer / Sub-Dealer who owns this customer',
+    )
     photo = models.ImageField(upload_to='customers/', blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_ACTIVE)
     join_date = models.DateField(auto_now_add=True)

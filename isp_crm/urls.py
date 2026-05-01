@@ -13,4 +13,5 @@ urlpatterns = [
     path('network/', include('network.urls')),
     path('tickets/', include('tickets.urls')),
     path('radius/', include('radius.urls')),
+    path('resellers/', include('resellers.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
