@@ -103,7 +103,7 @@
       {% endif %}
     </ul>
     <div class="px-3 py-3 border-top border-secondary">
-      <div class="d-flex align-items-center">
+      <div class="d-flex align-items-center mb-2">
         {% if user.avatar %}
           <img src="{{ user.avatar.url }}" class="rounded-circle me-2" width="32" height="32" style="object-fit:cover">
         {% else %}
@@ -115,8 +115,11 @@
           <div class="text-white small fw-semibold text-truncate">{{ user.get_full_name|default:user.username }}</div>
           <div class="text-muted" style="font-size:11px">{{ user.get_role_display }}</div>
         </div>
-        <a href="{% url 'accounts:logout' %}" class="text-muted ms-2" title="Logout"><i class="bi bi-box-arrow-right"></i></a>
+        <a href="{% url 'accounts:profile' %}" class="text-muted ms-2" title="Profile"><i class="bi bi-person-circle"></i></a>
       </div>
+      <a href="{% url 'accounts:logout' %}" class="btn btn-sm btn-outline-danger w-100">
+        <i class="bi bi-box-arrow-right me-1"></i>Logout
+      </a>
     </div>
   </nav>
 
