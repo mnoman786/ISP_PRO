@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.conf import settings
 from .models import NetworkDevice, IPPool
 from .forms import NetworkDeviceForm, IPPoolForm
 from .mikrotik import test_connection, get_active_sessions, enable_pppoe_user, disable_pppoe_user
@@ -77,11 +78,15 @@ def device_detail(request, pk):
         else:
             sessions_error = result
     connections = device.connections.select_related('customer', 'package').all()
+    server_ip = request.get_host().split(':')[0]
+    radius_secret = device.radius_secret or getattr(settings, 'RADIUS_DEFAULT_SECRET', 'testing123')
     return render(request, 'network/device_detail.html', {
         'device': device,
         'sessions': sessions,
         'sessions_error': sessions_error,
         'connections': connections,
+        'server_ip': server_ip,
+        'radius_secret': radius_secret,
     })
 
 

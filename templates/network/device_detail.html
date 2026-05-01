@@ -71,6 +71,28 @@
         </form>
       </div>
     </div>
+    <!-- MikroTik setup commands -->
+    <div class="card shadow-sm border-0 mb-3">
+      <div class="card-header bg-white fw-semibold border-0 pt-3 d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-terminal me-1 text-warning"></i>MikroTik Setup Commands</span>
+        <button class="btn btn-xs btn-outline-secondary btn-sm py-0 px-2" onclick="copyCommands()" title="Copy all">
+          <i class="bi bi-clipboard"></i>
+        </button>
+      </div>
+      <div class="card-body p-0">
+        <pre id="mikrotikCmds" class="mb-0 p-3 small" style="background:#1e1e1e;color:#d4d4d4;border-radius:0 0 .5rem .5rem;font-size:11px;white-space:pre-wrap"># 1. Point PPPoE to this RADIUS server
+/radius add service=ppp address={{ server_ip }} secret={{ radius_secret }} timeout=3000
+
+# 2. Enable RADIUS on PPP profile
+/ppp profile set default use-radius=yes
+
+# 3. Allow API access from this server
+/ip service set api address={{ server_ip }}/32
+
+# 4. Verify RADIUS is working
+/radius monitor 0 once</pre>
+      </div>
+    </div>
     {% endif %}
   </div>
 
@@ -167,6 +189,14 @@
 
 {% block extra_js %}
 <script>
+function copyCommands() {
+  const text = document.getElementById('mikrotikCmds').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target.closest('button');
+    btn.innerHTML = '<i class="bi bi-check"></i>';
+    setTimeout(() => btn.innerHTML = '<i class="bi bi-clipboard"></i>', 2000);
+  });
+}
 const testBtn = document.getElementById('testConnBtn');
 if (testBtn) {
   testBtn.addEventListener('click', function () {
